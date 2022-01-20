@@ -247,4 +247,30 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
   }
 });
 
+// @route   DELETE api/profile
+// @desc    Delete profile, user & posts
+// @access  Private
+
+router.delete('/user/:user_id', auth, async (req, res) => {
+  try {
+    // @todo - remove users posts
+    // Remove profile
+    await Profile.findOneAndRemove({ user: req.user.id });
+    // Remove user
+    await User.findOneAndRemove({ _id: req.user.id });
+
+
+
+    res.json({ msg: 'User deleted'});
+  } catch (err) {
+    console.error(err.message);
+
+    if(err.kind === 'ObjectId') {
+      return res.status(400).json({ msg: 'Profile not found' });
+    }
+
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
